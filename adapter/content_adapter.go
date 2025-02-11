@@ -38,4 +38,20 @@ func (a *ContentAdapter) SaveSchedule(schedule *domain.ContentSchedule) error {
 	panic("unimplemented")
 }
 
+func (a *ContentAdapter) UpdateContent(content *domain.Content) error {
+	return a.repository.Update(content)
+}
+
+func (a *ContentAdapter) UpdateSchedule(content *domain.ContentSchedule) error{
+	panic("unimplemented")
+}
+
+func (a *ContentAdapter) DeleteContent(contentId uint ) error {
+	return a.repository.Delete(contentId)
+}
+func (a *ContentAdapter) DeleteContentSchedule(ScheduleId uint ) error{
+	panic("unimplemented")
+}
+
+
 

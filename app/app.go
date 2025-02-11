@@ -13,7 +13,7 @@ import (
 
 // App 구조체 (의존성 및 라우터 관리)
 type App struct {
-	RegisterUseCase usecase.ContentRegisterUseCase
+	RegisterUseCase usecase.ContentManagementUseCase
 	FindUseCase     usecase.ContentFinderUseCase
 	Router          *gin.Engine
 }
@@ -34,22 +34,19 @@ func InitializeApp() *App {
 	var loadPort out.LoadPort = contentAdapter
 
 	// UseCase 생성
-	registerUseCase := service.NewContentRegisterService(savePort)
+	registerUseCase := service.NewContentManagementService(savePort)
 	findUseCase := service.NewContentFinderService(loadPort)
 
 	// 컨트롤러 생성
 	controller := api.NewContentController(registerUseCase, findUseCase)
 
 	// 라우터 설정
-	r := gin.Default()
-	r.GET("/contents/:id", controller.GetContentByID)
-	r.GET("/contents", controller.GetAllContents)
-	r.POST("/contents", controller.SaveContent)
+	router:= api.InitializeRouter(controller)
 
 	return &App{
 		RegisterUseCase: registerUseCase,
 		FindUseCase:     findUseCase,
-		Router:          r,
+		Router:          router,
 	}
 }
 

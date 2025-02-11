@@ -28,3 +28,13 @@ func (r *ContentRepositoryImpl) GetByID(id uint) (*domain.Content, error) {
     }
     return &content, nil
 }
+
+// 콘텐츠 업데이트
+func (r *ContentRepositoryImpl) Update(content *domain.Content) error {
+	return r.db.Model(&domain.Content{}).Where("id = ?", content.ID).Updates(content).Error
+}
+
+// 콘텐츠 삭제
+func (r *ContentRepositoryImpl) Delete(id uint) error {
+	return r.db.Delete(&domain.Content{}, id).Error
+}

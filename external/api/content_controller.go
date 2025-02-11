@@ -11,12 +11,12 @@ import (
 
 // ContentController 구조체
 type ContentController struct {
-	RegisterUseCase usecase.ContentRegisterUseCase
+	RegisterUseCase usecase.ContentManagementUseCase
 	FindUseCase     usecase.ContentFinderUseCase
 }
 
 // ContentController 생성자
-func NewContentController(registerUseCase usecase.ContentRegisterUseCase, findUseCase usecase.ContentFinderUseCase) *ContentController {
+func NewContentController(registerUseCase usecase.ContentManagementUseCase, findUseCase usecase.ContentFinderUseCase) *ContentController {
 	return &ContentController{
 		RegisterUseCase: registerUseCase,
 		FindUseCase:     findUseCase,
@@ -65,4 +65,36 @@ func (cc *ContentController) SaveContent(c *gin.Context) {
 		return
 	}
 	c.JSON(201, req)
+}
+
+func (cc *ContentController) UpdateContent(c *gin.Context) {
+	var req domain.Content
+	if err := c.BindJSON(&req); err != nil {
+		c.JSON(400, gin.H{"error": "Invalid request"})
+		return
+	}
+	err := cc.RegisterUseCase.UpdateContent(&req)
+	if err != nil {
+		c.JSON(500, gin.H{"error": "Failed to save content"})
+		return
+	}
+	c.JSON(201, req)
+}
+
+func (cc *ContentController) DeleteContent(c *gin.Context) {
+	idParam := c.Param("id")
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid content ID"})
+		return
+	}
+	// 콘텐츠 삭제 수행
+	err = cc.RegisterUseCase.DeleteContent(uint(id))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete content"})
+		return
+	}
+
+	// 성공 응답 반환
+	c.JSON(http.StatusOK, gin.H{"message": "Content deleted successfully"})
 }

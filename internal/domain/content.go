@@ -12,18 +12,19 @@ type Content struct {
     Title     string    `json:"title"`
     Content   string    `json:"content"`
     Photo     string    `json:"photo"`
-    SubTitle  string    `json:"sub_title"`
+    MainText  string    `json:"mainText"`
+    SubText   string    `json:"subText"`
     CreatedAt time.Time `json:"created_at"`
-    ChkDup    bool      `json:"chk_dup"`
+    ChkDup    bool      `json:"chkDup"`
     Duration  int       `json:"duration"`
-    StdDate   time.Time `json:"std_date"`
-    EndDate   time.Time `json:"end_date"`
-    TotSeats  int       `json:"tot_seats"`
+    StdDate   time.Time `json:"stdDate"`
+    EndDate   time.Time `json:"endDate"`
+    TotSeats  int       `json:"totSeats"`
     Schedules []ContentSchedule `json:"schedules"` // 1:N 관계
 }
 
 // Content 생성자 함수
-func NewContent(codeGrp, title, content, photo, subTitle string, duration, totSeats int, stdDate, endDate time.Time) (*Content, error) {
+func NewContent(codeGrp, title, content, photo, mainText string,subText string ,chkDup bool,duration, totSeats int, stdDate, endDate time.Time) (*Content, error) {
     if title == "" || content == "" {
         return nil, errors.New("title and content cannot be empty")
     }
@@ -33,14 +34,20 @@ func NewContent(codeGrp, title, content, photo, subTitle string, duration, totSe
         Title:     title,
         Content:   content,
         Photo:     photo,
-        SubTitle:  subTitle,
+        MainText:  mainText,
+        SubText:   subText,
         CreatedAt: time.Now(),
-        ChkDup:    false,
+        ChkDup:    chkDup,
         Duration:  duration,
         StdDate:   stdDate,
         EndDate:   endDate,
         TotSeats:  totSeats,
     }, nil
+}
+
+// TableName 메서드 오버라이드
+func (Content) TableName() string {
+    return "CONTENTS" // 대문자 테이블 이름
 }
 
 // Content 도메인 메서드

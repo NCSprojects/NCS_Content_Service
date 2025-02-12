@@ -8,7 +8,7 @@ import (
 // Content 도메인 모델
 type Content struct {
     ID        uint      `json:"id"`
-    CodeGrp   string    `json:"code_grp"`
+    CodeGrp   string    `json:"codeGrp"`
     Title     string    `json:"title"`
     Content   string    `json:"content"`
     Photo     string    `json:"photo"`

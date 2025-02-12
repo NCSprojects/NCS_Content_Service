@@ -24,10 +24,11 @@ func InitializeApp() *App {
 	database := config.InitDB()
 
 	// Repository 생성
-	repo := db.NewContentRepository(database)
+	contentRepo := db.NewContentRepository(database)
+	schduleRepo := db.NewScheduleRepository(database)
 
 	// Adapter 생성
-	contentAdapter := adapter.NewContentAdapter(repo)
+	contentAdapter := adapter.NewContentAdapter(contentRepo,schduleRepo)
 
 	// SavePort & LoadPort 변환
 	var savePort out.SavePort = contentAdapter

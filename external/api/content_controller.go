@@ -5,8 +5,9 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/scienceMuseum/content-service/internal/domain"
+	"github.com/scienceMuseum/content-service/internal/dto"
 	"github.com/scienceMuseum/content-service/internal/usecase"
+	"github.com/scienceMuseum/content-service/mapper"
 )
 
 // ContentController 구조체
@@ -23,7 +24,7 @@ func NewContentController(registerUseCase usecase.ContentManagementUseCase, find
 	}
 }
 
-// 콘텐츠 조회 API
+// 콘텐츠 조회 API (ID 기반)
 func (cc *ContentController) GetContentByID(c *gin.Context) {
 	idParam := c.Param("id")
 
@@ -34,53 +35,79 @@ func (cc *ContentController) GetContentByID(c *gin.Context) {
 		return
 	}
 
+	// 콘텐츠 조회
 	content, err := cc.FindUseCase.GetContentByID(uint(id))
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Content not found"})
 		return
 	}
 
-	c.JSON(http.StatusOK, content)
+	// Domain → DTO 변환 후 반환
+	c.JSON(http.StatusOK, mapper.ToContentResponseDTO(content))
 }
 
+// 모든 콘텐츠 조회 API
 func (cc *ContentController) GetAllContents(c *gin.Context) {
 	contents, err := cc.FindUseCase.GetAllContents()
 	if err != nil {
-		c.JSON(500, gin.H{"error": "Failed to retrieve contents"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve contents"})
 		return
 	}
-	c.JSON(200, contents)
+
+	// 변환된 DTO 리스트 반환
+	var responseDTOs []dto.ContentResponseDTO
+	for _, content := range contents {
+		responseDTOs = append(responseDTOs, *mapper.ToContentResponseDTO(content))
+	}
+
+	c.JSON(http.StatusOK, responseDTOs)
 }
 
 // 콘텐츠 등록 API
 func (cc *ContentController) SaveContent(c *gin.Context) {
-	var req domain.Content
+	var req dto.ContentRequestDTO
 	if err := c.BindJSON(&req); err != nil {
-		c.JSON(400, gin.H{"error": "Invalid request"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
 		return
 	}
-	err := cc.RegisterUseCase.SaveContent(&req)
+
+	// DTO → Domain 변환
+	content := mapper.ToContentDomain(&req)
+
+	// 콘텐츠 저장
+	err := cc.RegisterUseCase.SaveContent(content)
 	if err != nil {
-		c.JSON(500, gin.H{"error": "Failed to save content"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save content"})
 		return
 	}
-	c.JSON(201, req)
+
+	// 변환된 응답 DTO 반환
+	c.JSON(http.StatusCreated, mapper.ToContentResponseDTO(content))
 }
 
+// 콘텐츠 업데이트 API
 func (cc *ContentController) UpdateContent(c *gin.Context) {
-	var req domain.Content
+	var req dto.ContentRequestDTO
 	if err := c.BindJSON(&req); err != nil {
-		c.JSON(400, gin.H{"error": "Invalid request"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
 		return
 	}
-	err := cc.RegisterUseCase.UpdateContent(&req)
+
+	// DTO → Domain 변환
+	content := mapper.ToContentDomain(&req)
+
+	// 콘텐츠 업데이트
+	err := cc.RegisterUseCase.UpdateContent(content)
 	if err != nil {
-		c.JSON(500, gin.H{"error": "Failed to save content"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update content"})
 		return
 	}
-	c.JSON(201, req)
+
+	// 변환된 응답 DTO 반환
+	c.JSON(http.StatusOK, mapper.ToContentResponseDTO(content))
 }
 
+// 콘텐츠 삭제 API
 func (cc *ContentController) DeleteContent(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.Atoi(idParam)
@@ -88,6 +115,7 @@ func (cc *ContentController) DeleteContent(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid content ID"})
 		return
 	}
+
 	// 콘텐츠 삭제 수행
 	err = cc.RegisterUseCase.DeleteContent(uint(id))
 	if err != nil {

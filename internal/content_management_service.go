@@ -23,7 +23,7 @@ func (s *ContentManagementService) SaveContent(content *domain.Content) error {
 }
 
 // 시간표 저장
-func (s *ContentManagementService) SaveSchedule(schedule *domain.ContentSchedule) error {
+func (s *ContentManagementService) SaveSchedule(schedule []domain.ContentSchedule) error {
 	return s.savePort.SaveSchedule(schedule)
 }
 

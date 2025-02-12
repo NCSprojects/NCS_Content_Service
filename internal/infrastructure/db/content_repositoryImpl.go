@@ -23,10 +23,13 @@ func (r *ContentRepositoryImpl) Create(content *domain.Content) error {
 // 콘텐츠 조회 (ID 기반)
 func (r *ContentRepositoryImpl) GetByID(id uint) (*domain.Content, error) {
     var content domain.Content
-    if err := r.db.First(&content, id).Error; err != nil {
-        return nil, err
-    }
-    return &content, nil
+
+	err := r.db.Preload("Schedules").First(&content, id).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return &content, nil
 }
 
 // 콘텐츠 업데이트
@@ -38,3 +41,5 @@ func (r *ContentRepositoryImpl) Update(content *domain.Content) error {
 func (r *ContentRepositoryImpl) Delete(id uint) error {
 	return r.db.Delete(&domain.Content{}, id).Error
 }
+
+

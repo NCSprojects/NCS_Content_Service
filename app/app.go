@@ -16,6 +16,7 @@ type App struct {
 	RegisterUseCase usecase.ContentManagementUseCase
 	FindUseCase     usecase.ContentFinderUseCase
 	Router          *gin.Engine
+	EurekaClient    *config.EurekaClient
 }
 
 // 애플리케이션 초기화
@@ -44,10 +45,15 @@ func InitializeApp() *App {
 	// 라우터 설정
 	router:= api.InitializeRouter(controller)
 
+	// Eureka Client 설정
+	eurekaClient := config.NewEurekaClient()
+	eurekaClient.Register()
+
 	return &App{
 		RegisterUseCase: registerUseCase,
 		FindUseCase:     findUseCase,
 		Router:          router,
+		EurekaClient: eurekaClient,
 	}
 }
 

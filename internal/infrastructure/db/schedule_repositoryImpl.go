@@ -1,6 +1,8 @@
 package db
 
 import (
+	"time"
+
 	"github.com/scienceMuseum/content-service/internal/domain"
 	"gorm.io/gorm"
 )
@@ -45,3 +47,11 @@ func (r *ScheduleRepositoryImpl) Update(schedule *domain.ContentSchedule) error 
 func (r *ScheduleRepositoryImpl) Delete(scheduleId uint) error {
 	return r.db.Delete(&domain.ContentSchedule{}, scheduleId).Error
 }
+
+// 특정 StartTime을 가진 Schedule 조회
+func (r *ScheduleRepositoryImpl) FindByStartTime(startTime time.Time) ([]domain.ContentSchedule, error) {
+	var schedules []domain.ContentSchedule
+	err := r.db.Where("start_time = ?", startTime).Find(&schedules).Error
+	return schedules, err
+}
+

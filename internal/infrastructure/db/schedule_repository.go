@@ -12,5 +12,5 @@ type ScheduleRepository interface {
     Create(schedule []domain.ContentSchedule) error
     Update(schedule *domain.ContentSchedule) error
     Delete(scheduleId uint) error
-    FindByStartTime(startTime time.Time) ([]domain.ContentSchedule, error)
+    GetByStartTime(startTime time.Time) ([]*domain.ContentSchedule, error)
 }

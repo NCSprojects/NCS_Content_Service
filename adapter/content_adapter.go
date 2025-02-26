@@ -1,6 +1,8 @@
 package adapter
 
 import (
+	"time"
+
 	"github.com/scienceMuseum/content-service/internal/domain"
 	"github.com/scienceMuseum/content-service/internal/infrastructure/db"
 	"github.com/scienceMuseum/content-service/internal/port/out"
@@ -31,6 +33,11 @@ func (a *ContentAdapter) GetContentByID(id uint) (*domain.Content, error) {
 func (a *ContentAdapter) GetSchedulesByContentID(contentID uint) ([]*domain.ContentSchedule, error) {
 	return a.scheduleRepository.GetByContentID(contentID)
 }
+
+func (a* ContentAdapter) GetSchedulesByStartTime(startTime time.Time) ([]*domain.ContentSchedule, error) {
+	return a.scheduleRepository.GetByStartTime(startTime)
+}
+
 
 func (a *ContentAdapter) SaveContent(content *domain.Content) error {
 	return a.contentRepository.Create(content)

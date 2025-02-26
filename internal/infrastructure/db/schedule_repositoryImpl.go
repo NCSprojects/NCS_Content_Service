@@ -49,9 +49,15 @@ func (r *ScheduleRepositoryImpl) Delete(scheduleId uint) error {
 }
 
 // 특정 StartTime을 가진 Schedule 조회
-func (r *ScheduleRepositoryImpl) FindByStartTime(startTime time.Time) ([]domain.ContentSchedule, error) {
-	var schedules []domain.ContentSchedule
-	err := r.db.Where("start_time = ?", startTime).Find(&schedules).Error
+func (r *ScheduleRepositoryImpl) GetByStartTime(startTime time.Time) ([]*domain.ContentSchedule, error) {
+	var schedules []*domain.ContentSchedule
+	// start_time 00 시 부터 23:59:59 까지
+	startOfDay := time.Date(startTime.Year(), startTime.Month(), startTime.Day(), 0, 0, 0, 0, startTime.Location())
+	endOfDay := time.Date(startTime.Year(), startTime.Month(), startTime.Day(), 23, 59, 59, 999999999, startTime.Location()) // ✅ 23:59:59
+
+	// 해당 날짜의 모든 스케줄 조회
+	err := r.db.Where("start_time >= ? AND start_time <= ?", startOfDay, endOfDay).Find(&schedules).Error
+
 	return schedules, err
 }
 

@@ -36,7 +36,6 @@ func NewEurekaClient() *EurekaClient {
 // Register: Eureka에 서비스 등록
 func (e *EurekaClient) Register() {
 	log.Println("Eureka: 서비스 등록 시도 중...")
-
 	// 등록 요청 데이터 생성
 	instance := map[string]interface{}{
 		"instance": map[string]interface{}{
@@ -56,19 +55,19 @@ func (e *EurekaClient) Register() {
 		},
 	}
 
-	// JSON 변환
 	jsonData, err := json.Marshal(instance)
 	if err != nil {
-		log.Fatalf("Eureka: JSON 변환 실패 - %v", err)
+		log.Printf("Eureka: JSON 변환 실패 - %v", err)
+		return 
 	}
-
 	// POST 요청 보내기
 	url := e.EurekaServerURL + "/apps/" + e.AppName
 	log.Printf("Eureka 등록 요청 URL: %s", url)
 
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
 	if err != nil {
-		log.Fatalf("Eureka: 등록 요청 생성 실패 - %v", err)
+		log.Printf("Eureka: 등록 요청 생성 실패 - %v", err)
+		return
 	}
 
 	req.Header.Set("Content-Type", "application/json")
@@ -76,11 +75,11 @@ func (e *EurekaClient) Register() {
 	client := &http.Client{Timeout: 5 * time.Second}
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Fatalf("Eureka: 등록 요청 실패 - %v", err)
+		log.Printf("Eureka: 등록 요청 실패 - %v", err)
+		return
 	}
 	defer resp.Body.Close()
 
-	// 응답 코드 확인
 	if resp.StatusCode >= 200 && resp.StatusCode < 300 {
 		log.Println("Eureka: 서비스 등록 성공")
 	} else {

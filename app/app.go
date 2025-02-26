@@ -1,6 +1,9 @@
 package app
 
 import (
+	"fmt"
+	"log"
+
 	"github.com/gin-gonic/gin"
 	"github.com/scienceMuseum/content-service/adapter"
 	"github.com/scienceMuseum/content-service/config"
@@ -16,6 +19,7 @@ type App struct {
 	RegisterUseCase usecase.ContentManagementUseCase
 	FindUseCase     usecase.ContentFinderUseCase
 	Router          *gin.Engine
+	GRPCServer      *config.GRPCServer
 	EurekaClient    *config.EurekaClient
 }
 
@@ -29,7 +33,7 @@ func InitializeApp() *App {
 	schduleRepo := db.NewScheduleRepository(database)
 
 	// Adapter 생성
-	contentAdapter := adapter.NewContentAdapter(contentRepo,schduleRepo)
+	contentAdapter := adapter.NewContentAdapter(contentRepo, schduleRepo)
 
 	// SavePort & LoadPort 변환
 	var savePort out.SavePort = contentAdapter
@@ -43,7 +47,10 @@ func InitializeApp() *App {
 	controller := api.NewContentController(registerUseCase, findUseCase)
 
 	// 라우터 설정
-	router:= api.InitializeRouter(controller)
+	router := api.InitializeRouter(controller)
+
+	// gRPC 서버 생성
+	grpcServer := config.NewGRPCServer(findUseCase)
 
 	// Eureka Client 설정
 	eurekaClient := config.NewEurekaClient()
@@ -53,11 +60,17 @@ func InitializeApp() *App {
 		RegisterUseCase: registerUseCase,
 		FindUseCase:     findUseCase,
 		Router:          router,
-		EurekaClient: eurekaClient,
+		GRPCServer:      grpcServer,
+		EurekaClient:    eurekaClient,
 	}
 }
 
-// 서버 실행
+// gRPC + HTTP 서버 동시에 실행
 func (a *App) StartServer() {
-	a.Router.Run(":3400")
+	go func() { // gRPC 서버 실행 (별도 goroutine)
+		a.GRPCServer.StartGRPCServer()
+	}()
+
+	fmt.Println("🚀 HTTP server started on :3400")
+	log.Fatal(a.Router.Run(":3400")) // HTTP 서버 실행
 }

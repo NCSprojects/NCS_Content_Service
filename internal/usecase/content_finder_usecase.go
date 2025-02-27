@@ -10,4 +10,5 @@ type ContentFinderUseCase interface {
 	GetContentByID(id uint) (*domain.Content, error)
 	GetSchedulesByContentID(contentID uint) ([]*domain.ContentSchedule, error)
 	GetSchedulesIdByStartTime(startTimeStr string) ([]*string, error)
+	GetStartTimeBySchedulesId(scheduleId string)(string , error)
 }

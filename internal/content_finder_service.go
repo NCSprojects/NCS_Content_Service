@@ -66,3 +66,21 @@ func (s *ContentFinderService) GetSchedulesIdByStartTime(startTime string) ([]*s
 
     return scheduleIDs, nil
 }
+func (s *ContentFinderService) GetStartTimeBySchedulesId(scheduleId string) (string, error) {
+	// scheduleId (string) → uint 변환
+	var parsedScheduleID uint
+	_, err := fmt.Sscanf(scheduleId, "%d", &parsedScheduleID)
+	if err != nil {
+		return "", fmt.Errorf("invalid schedule_id format: %v", err) 
+	}
+
+	// LoadPort를 사용하여 스케줄 조회
+	schedule, err := s.loadPort.GetSchedulesByScheduleId(parsedScheduleID)
+	if err != nil {
+		return "", fmt.Errorf("failed to retrieve schedule: %v", err) 
+	}
+
+	startTimeStr := schedule.StartTime.Format("2006-01-02 15:04:05")
+
+	return startTimeStr, nil
+}

@@ -38,6 +38,9 @@ func (a* ContentAdapter) GetSchedulesByStartTime(startTime time.Time) ([]*domain
 	return a.scheduleRepository.GetByStartTime(startTime)
 }
 
+func (a* ContentAdapter) GetSchedulesByScheduleId(scheduleId uint) (*domain.ContentSchedule, error) {
+	return a.scheduleRepository.GetByID(scheduleId)
+} 
 
 func (a *ContentAdapter) SaveContent(content *domain.Content) error {
 	return a.contentRepository.Create(content)

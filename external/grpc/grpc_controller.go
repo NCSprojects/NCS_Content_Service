@@ -44,3 +44,17 @@ func (c *GRPCController) GetScheduleIdsByStartTime(ctx context.Context, req *pb.
 	// 응답 데이터 생성
 	return &pb.ScheduleResponse{ScheduleIds: scheduleIDs}, nil
 }
+
+func (c *GRPCController) GetStartTimeBySchedulesId(ctx context.Context, req *pb.ScheduleIdRequest) (*pb.StartTimeResponse, error) {
+	log.Printf("gRPC 요청 수신: GetStartTimeBySchedulesId(schedule_id=%s)", req.ScheduleId)
+
+	// UseCase를 호출하여 스케줄 시작 시간 조회
+	startTime, err := c.FindUseCase.GetStartTimeBySchedulesId(req.ScheduleId)
+	if err != nil {
+		log.Printf("gRPC 요청 실패: %v", err)
+		return nil, fmt.Errorf("failed to get schedule start time: %w", err)
+	}
+
+	// 응답 데이터 생성
+	return &pb.StartTimeResponse{StartTime: startTime}, nil
+}

@@ -23,13 +23,13 @@ func (r *ScheduleRepositoryImpl) Create(schedules []domain.ContentSchedule) erro
 }
 
 // 특정 Content에 속한 Schedule 조회
-func (r *ScheduleRepositoryImpl) GetByContentID(contentID uint) ([]*domain.ContentSchedule, error) {
+func (r *ScheduleRepositoryImpl) GetByContentID(contentID uint, startDate time.Time, endDate time.Time) ([]*domain.ContentSchedule, error) {
 	var schedules []*domain.ContentSchedule
-	err := r.db.Where("content_id = ?", contentID).Find(&schedules).Error
+	err := r.db.Where("content_id = ? AND start_time >= ? AND end_time <= ?", contentID , startDate, endDate).Find(&schedules).Error
 	return schedules, err
 }
 
-// Schedule 조회 (ID 기반) - 반환 타입을 *domain.ContentSchedule 로 수정
+// Schedule 조회 (ID 기반) 
 func (r *ScheduleRepositoryImpl) GetByID(scheduleId uint) (*domain.ContentSchedule, error) {
 	var schedule domain.ContentSchedule
 	if err := r.db.First(&schedule, scheduleId).Error; err != nil {

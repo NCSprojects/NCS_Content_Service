@@ -126,3 +126,25 @@ func (cc *ContentController) DeleteContent(c *gin.Context) {
 	// 성공 응답 반환
 	c.JSON(http.StatusOK, gin.H{"message": "Content deleted successfully"})
 }
+
+// 스케줄 조회 API (Content ID 기반)
+func (cc *ContentController) GetTodaySchedulesByContentId(c *gin.Context) {
+	idParam := c.Param("id")
+
+	// 문자열을 uint로 변환
+	id, err := strconv.ParseUint(idParam, 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID format"})
+		return
+	}
+
+	// 스케쥴 조회
+	schedules, err := cc.FindUseCase.GetTodaySchedulesByContentId(uint(id))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Schedules not found"})
+		return
+	}
+
+	// Domain → DTO 변환 후 반환
+	c.JSON(http.StatusOK, mapper.ToScheduleResponseDTOs(schedules))
+}

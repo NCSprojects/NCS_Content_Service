@@ -30,7 +30,7 @@ func parseDate(dateStr string) (time.Time, error) {
 	return parsedTime, nil
 }
 
-func (s *ContentFinderService) GetSchedulesByContentID(contentID uint) ([]*domain.ContentSchedule, error) {
+func (s *ContentFinderService) GetSchedulesByContentID(contentID uint,startDate time.Time,endDate time.Time) ([]*domain.ContentSchedule, error) {
 	panic("unimplemented")
 }
 
@@ -83,4 +83,12 @@ func (s *ContentFinderService) GetStartTimeBySchedulesId(scheduleId string) (str
 	startTimeStr := schedule.StartTime.Format("2006-01-02 15:04:05")
 
 	return startTimeStr, nil
+}
+
+func (s * ContentFinderService) GetTodaySchedulesByContentId(contentID uint) ([]*domain.ContentSchedule, error){
+	now := time.Now()
+	startOfDay := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
+	endOfDay := time.Date(now.Year(), now.Month(), now.Day(), 23, 59, 59, 999999999, now.Location())
+
+	return s.loadPort.GetSchedulesByContentID(contentID,startOfDay,endOfDay)
 }

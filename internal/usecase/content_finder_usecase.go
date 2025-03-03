@@ -1,6 +1,8 @@
 package usecase
 
 import (
+	"time"
+
 	"github.com/scienceMuseum/content-service/internal/domain"
 )
 
@@ -8,7 +10,8 @@ import (
 type ContentFinderUseCase interface {
 	GetAllContents() ([]*domain.Content, error)
 	GetContentByID(id uint) (*domain.Content, error)
-	GetSchedulesByContentID(contentID uint) ([]*domain.ContentSchedule, error)
+	GetSchedulesByContentID(contentID uint,startDate time.Time,endDate time.Time) ([]*domain.ContentSchedule, error)
 	GetSchedulesIdByStartTime(startTimeStr string) ([]*string, error)
 	GetStartTimeBySchedulesId(scheduleId string)(string , error)
+	GetTodaySchedulesByContentId(contentID uint) ([]*domain.ContentSchedule, error)
 }

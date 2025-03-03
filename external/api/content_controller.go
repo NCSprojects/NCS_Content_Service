@@ -140,7 +140,7 @@ func (cc *ContentController) GetTodaySchedulesByContentId(c *gin.Context) {
 
 	// 스케쥴 조회
 	schedules, err := cc.FindUseCase.GetTodaySchedulesByContentId(uint(id))
-	if err != nil {
+	if err != nil || len(schedules) == 0 {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Schedules not found"})
 		return
 	}

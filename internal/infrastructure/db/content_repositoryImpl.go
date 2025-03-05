@@ -32,6 +32,17 @@ func (r *ContentRepositoryImpl) GetByID(id uint) (*domain.Content, error) {
 	return &content, nil
 }
 
+func (r *ContentRepositoryImpl) GetByCodeGroup(codeGrp string) ([]*domain.Content, error) {
+    var contents []*domain.Content
+
+	err := r.db.Preload("Schedules").Where("code_grp = ?", codeGrp).Find(&contents).Error
+    if err != nil {
+        return nil, err
+    }
+
+    return contents, nil
+}
+
 // 콘텐츠 업데이트
 func (r *ContentRepositoryImpl) Update(content *domain.Content) error {
 	return r.db.Model(&domain.Content{}).Where("id = ?", content.ID).Updates(content).Error

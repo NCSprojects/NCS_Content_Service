@@ -17,6 +17,7 @@ func InitializeRouter(controller *ContentController) *gin.Engine {
 		contentsGroup.PUT("/:id", controller.UpdateContent)    // 콘텐츠 수정
 		contentsGroup.DELETE("/:id", controller.DeleteContent) // 콘텐츠 삭제
 		contentsGroup.GET("/schedule/:id", controller.GetTodaySchedulesByContentId) // 오늘 특정 컨텐츠 스케줄 조회 
+		contentsGroup.GET("/floor/:floor", controller.GetContentsByFloor) // 해당 층에 해당하는 컨텐츠 조회
 	}
 
 	return r

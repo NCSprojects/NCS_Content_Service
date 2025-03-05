@@ -39,6 +39,11 @@ func (s *ContentFinderService) GetContentByID(id uint) (*domain.Content, error) 
 	return s.loadPort.GetContentByID(id)
 }
 
+// 층수별 조회 
+func (s *ContentFinderService) GetContentByFloor(floor string) ([]*domain.Content, error){
+	return s.loadPort.GetContentByCodeGroup(floor)
+}
+
 // 모든 콘텐츠 조회
 func (s *ContentFinderService) GetAllContents() ([]*domain.Content, error) {
 	return s.loadPort.GetAllContents()

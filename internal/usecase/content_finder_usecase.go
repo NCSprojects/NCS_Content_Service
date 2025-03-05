@@ -10,6 +10,7 @@ import (
 type ContentFinderUseCase interface {
 	GetAllContents() ([]*domain.Content, error)
 	GetContentByID(id uint) (*domain.Content, error)
+	GetContentByFloor(floor string) ([]*domain.Content, error)
 	GetSchedulesByContentID(contentID uint,startDate time.Time,endDate time.Time) ([]*domain.ContentSchedule, error)
 	GetSchedulesIdByStartTime(startTimeStr string) ([]*string, error)
 	GetStartTimeBySchedulesId(scheduleId string)(string , error)

@@ -63,6 +63,20 @@ func (cc *ContentController) GetAllContents(c *gin.Context) {
 	c.JSON(http.StatusOK, responseDTOs)
 }
 
+// 같은 층수의 컨텐츠들 조회
+func (cc *ContentController) GetContentsByFloor(c *gin.Context) {
+    floor := c.Param("floor")
+
+    contents, err := cc.FindUseCase.GetContentByFloor(floor)
+    if err != nil || len(contents) == 0 {
+        c.JSON(http.StatusNotFound, gin.H{"error": "No contents found for this floor"})
+        return
+    }
+
+    // 변환된 DTO 리스트 반환
+    c.JSON(http.StatusOK, mapper.ToContentResponseDTOs(contents))
+}
+
 // 콘텐츠 등록 API
 func (cc *ContentController) SaveContent(c *gin.Context) {
 	var req dto.ContentRequestDTO

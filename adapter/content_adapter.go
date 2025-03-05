@@ -30,6 +30,10 @@ func (a *ContentAdapter) GetContentByID(id uint) (*domain.Content, error) {
 	return a.contentRepository.GetByID(id)
 }
 
+func (a *ContentAdapter) GetContentByCodeGroup(codeGrp string) ([]*domain.Content, error) {
+	return a.contentRepository.GetByCodeGroup(codeGrp)
+}
+
 func (a *ContentAdapter) GetSchedulesByContentID(contentID uint,startDate time.Time,endDate time.Time) ([]*domain.ContentSchedule, error) {
 	return a.scheduleRepository.GetByContentID(contentID,startDate,endDate)
 }

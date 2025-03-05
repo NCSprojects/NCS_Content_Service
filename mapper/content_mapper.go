@@ -75,3 +75,12 @@ func ToContentResponseDTO(content *domain.Content) *dto.ContentResponseDTO {
 
     return response
 }
+
+// 복수 Contents 를 DTO 리스트로 변환
+func ToContentResponseDTOs(contents []*domain.Content) []dto.ContentResponseDTO {
+    var responseDTOs []dto.ContentResponseDTO
+    for _, content := range contents {
+        responseDTOs = append(responseDTOs, *ToContentResponseDTO(content))
+    }
+    return responseDTOs
+}

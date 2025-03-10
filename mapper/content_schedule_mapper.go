@@ -26,3 +26,4 @@ func ToScheduleResponseDTOs(schedules []*domain.ContentSchedule) []dto.ScheduleR
 	}
 	return scheduleDTOs
 }
+

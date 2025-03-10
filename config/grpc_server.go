@@ -14,6 +14,7 @@ import (
 // GRPCServer 구조체
 type GRPCServer struct {
 	pb.UnimplementedScheduleServiceServer
+	pb.UnimplementedContentStatsServiceServer
 	FindUseCase usecase.ContentFinderUseCase
 }
 
@@ -34,6 +35,7 @@ func (s *GRPCServer) StartGRPCServer() {
 	// gRPC 컨트롤러 생성 및 등록
 	grpcController := grpcController.NewGRPCController(s.FindUseCase)
 	pb.RegisterScheduleServiceServer(grpcServer, grpcController)
+	pb.RegisterContentStatsServiceServer(grpcServer, grpcController)
 
 	fmt.Println("🚀 gRPC server started on :50070")
 	if err := grpcServer.Serve(lis); err != nil {

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/scienceMuseum/content-service/common"
 	"github.com/scienceMuseum/content-service/internal/domain"
 	"github.com/scienceMuseum/content-service/internal/port/out"
 	"github.com/scienceMuseum/content-service/internal/usecase"
@@ -20,18 +21,10 @@ var _ usecase.ContentFinderUseCase = (*ContentFinderService)(nil)
 func NewContentFinderService(load out.LoadPort) *ContentFinderService {
 	return &ContentFinderService{loadPort: load}
 }
-// 시간 변환 함수
-func parseDate(dateStr string) (time.Time, error) {
-	layout := "2006-01-02" // YYYY-MM-DD 형식
-	parsedTime, err := time.Parse(layout, dateStr)
-	if err != nil {
-		return time.Time{}, fmt.Errorf("invalid date format: expected YYYY-MM-DD, got %s", dateStr)
-	}
-	return parsedTime, nil
-}
+
 
 func (s *ContentFinderService) GetSchedulesByContentID(contentID uint,startDate time.Time,endDate time.Time) ([]*domain.ContentSchedule, error) {
-	panic("unimplemented")
+	return s.loadPort.GetSchedulesByContentID(contentID,startDate,endDate)
 }
 
 // 콘텐츠 조회 (ID 기반)
@@ -51,7 +44,7 @@ func (s *ContentFinderService) GetAllContents() ([]*domain.Content, error) {
 
 func (s *ContentFinderService) GetSchedulesIdByStartTime(startTime string) ([]*string, error) {
     // 문자열을 time.Time으로 변환
-    parsedTime, err := parseDate(startTime)
+    parsedTime, err := common.ParseDate(startTime)
     if err != nil {
         return nil, fmt.Errorf("invalid startTime format: %v", err)
     }

@@ -20,11 +20,12 @@ type Content struct {
     StdDate   time.Time `json:"stdDate"`
     EndDate   time.Time `json:"endDate"`
     TotSeats  int       `json:"totSeats"`
+    Rnk       string    `json:"rnk"`
     Schedules []ContentSchedule `json:"schedules"` // 1:N 관계
 }
 
 // Content 생성자 함수
-func NewContent(codeGrp, title, content, photo, mainText string,subText string ,chkDup bool,duration, totSeats int, stdDate, endDate time.Time) (*Content, error) {
+func NewContent(codeGrp, title, content, photo, mainText string,subText string ,chkDup bool,duration, totSeats int, stdDate, endDate time.Time,content_rnk string) (*Content, error) {
     if title == "" || content == "" {
         return nil, errors.New("title and content cannot be empty")
     }
@@ -42,6 +43,7 @@ func NewContent(codeGrp, title, content, photo, mainText string,subText string ,
         StdDate:   stdDate,
         EndDate:   endDate,
         TotSeats:  totSeats,
+        Rnk: content_rnk,
     }, nil
 }
 

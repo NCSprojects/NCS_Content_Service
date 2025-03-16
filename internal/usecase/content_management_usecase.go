@@ -7,5 +7,6 @@ type ContentManagementUseCase interface {
 	SaveContent(content *domain.Content) error
 	SaveSchedule(schedule []domain.ContentSchedule) error
 	UpdateContent(content *domain.Content) error
+	ReorderContentRanks(contents[] * domain.Content)error
 	DeleteContent(contentId uint) error
 }

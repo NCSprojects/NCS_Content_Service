@@ -58,6 +58,10 @@ func (a *ContentAdapter) UpdateContent(content *domain.Content) error {
 	return a.contentRepository.Update(content)
 }
 
+func (a *ContentAdapter) UpdateRnk(contents []*domain.Content) error {
+	return a.contentRepository.BulkRnkUpdate(contents)
+}
+
 func (a *ContentAdapter) UpdateSchedule(schedule *domain.ContentSchedule) error{
 	return a.scheduleRepository.Update(schedule)
 }

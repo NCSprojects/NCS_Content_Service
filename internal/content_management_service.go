@@ -32,6 +32,11 @@ func (s *ContentManagementService) UpdateContent(content *domain.Content) error 
 	return s.savePort.UpdateContent(content)
 }
 
+// 콘텐츠 순서 수정
+func (s *ContentManagementService) ReorderContentRanks(contents[] * domain.Content) error{
+	return s.savePort.UpdateRnk(contents)
+}
+
 // 콘텐츠 삭제
 func (s *ContentManagementService) DeleteContent(contentId uint) error {
 	return s.savePort.DeleteContent(contentId)

@@ -48,6 +48,23 @@ func (r *ContentRepositoryImpl) Update(content *domain.Content) error {
 	return r.db.Model(&domain.Content{}).Where("id = ?", content.ID).Updates(content).Error
 }
 
+func (r *ContentRepositoryImpl) BulkRnkUpdate(contents []*domain.Content) error {
+	return r.db.Transaction(func(tx *gorm.DB) error {
+		for _, content := range contents {
+			updateData := map[string]interface{}{
+				"order": content.Rnk, // 순서 컬럼만 업데이트
+			}
+
+			if err := tx.Model(&domain.Content{}).
+				Where("id = ?", content.ID).
+				Updates(updateData).Error; err != nil {
+				return err // 하나라도 실패하면 롤백
+			}
+		}
+		return nil // 모두 성공하면 커밋
+	})
+}
+
 // 콘텐츠 삭제
 func (r *ContentRepositoryImpl) Delete(id uint) error {
 	return r.db.Delete(&domain.Content{}, id).Error

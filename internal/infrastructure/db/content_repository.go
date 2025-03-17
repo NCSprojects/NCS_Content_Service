@@ -7,7 +7,7 @@ type ContentRepository interface {
     GetByCodeGroup(codeGrp string) ([]*domain.Content, error)
     Create(content *domain.Content) error
     Update(content *domain.Content) error
-    BulkRnkUpdate(contents []*domain.Content) error
+    BulkColumnUpdate(idx []int, columnName string, values []interface{}) error
     Delete(contentId uint) error
     
 }

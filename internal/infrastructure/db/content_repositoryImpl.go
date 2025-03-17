@@ -48,15 +48,16 @@ func (r *ContentRepositoryImpl) Update(content *domain.Content) error {
 	return r.db.Model(&domain.Content{}).Where("id = ?", content.ID).Updates(content).Error
 }
 
-func (r *ContentRepositoryImpl) BulkRnkUpdate(contents []*domain.Content) error {
+func (r *ContentRepositoryImpl) BulkColumnUpdate(ids []int, columnName string, values []interface{}) error {
+
 	return r.db.Transaction(func(tx *gorm.DB) error {
-		for _, content := range contents {
+		for i, id := range ids {
 			updateData := map[string]interface{}{
-				"order": content.Rnk, // 순서 컬럼만 업데이트
+				columnName: values[i],
 			}
 
 			if err := tx.Model(&domain.Content{}).
-				Where("id = ?", content.ID).
+				Where("id = ?", id).
 				Updates(updateData).Error; err != nil {
 				return err // 하나라도 실패하면 롤백
 			}

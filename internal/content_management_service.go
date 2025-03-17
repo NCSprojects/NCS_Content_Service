@@ -33,8 +33,8 @@ func (s *ContentManagementService) UpdateContent(content *domain.Content) error 
 }
 
 // 콘텐츠 순서 수정
-func (s *ContentManagementService) ReorderContentRanks(contents[] * domain.Content) error{
-	return s.savePort.UpdateRnk(contents)
+func (s *ContentManagementService) ReorderContentRanks(idx []int, values []interface{}) error{
+	return s.savePort.UpdateRnk(idx,"Rnk",values)
 }
 
 // 콘텐츠 삭제

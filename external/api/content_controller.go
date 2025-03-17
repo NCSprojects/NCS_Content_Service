@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/scienceMuseum/content-service/common"
 	"github.com/scienceMuseum/content-service/internal/dto"
 	"github.com/scienceMuseum/content-service/internal/usecase"
 	"github.com/scienceMuseum/content-service/mapper"
@@ -140,6 +141,42 @@ func (cc *ContentController) DeleteContent(c *gin.Context) {
 	// 성공 응답 반환
 	c.JSON(http.StatusOK, gin.H{"message": "Content deleted successfully"})
 }
+
+// 콘텐츠 순서 수정 API
+func (cc *ContentController) ReorderContentRanks(ctx *gin.Context) {
+	var updateList []dto.UpdateRnkDTO
+
+	// JSON 요청 바인딩 및 검증
+	if err := ctx.ShouldBindJSON(&updateList); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// ID 리스트 추출
+	ids, err := common.GetStructFieldValues(updateList, "ID")
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "ID 필드 조회 실패: " + err.Error()})
+		return
+	}
+
+	// Rnk 리스트 추출
+	values, err := common.GetStructFieldValues(updateList, "Rnk")
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Rnk 필드 조회 실패: " + err.Error()})
+		return
+	}
+
+	// 서비스 호출
+	err = cc.RegisterUseCase.ReorderContentRanks(common.ConvertToIntSlice(ids), values)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "순서 업데이트 실패"})
+		return
+	}
+
+	// 성공 응답
+	ctx.JSON(http.StatusOK, gin.H{"message": "순서 업데이트 성공"})
+}
+
 
 // 스케줄 조회 API (Content ID 기반)
 func (cc *ContentController) GetTodaySchedulesByContentId(c *gin.Context) {

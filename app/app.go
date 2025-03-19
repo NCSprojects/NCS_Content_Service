@@ -21,6 +21,7 @@ type App struct {
 	Router          *gin.Engine
 	GRPCServer      *config.GRPCServer
 	EurekaClient    *config.EurekaClient
+	MinIOClient     *config.MinIOClient
 }
 
 // 애플리케이션 초기화
@@ -28,19 +29,25 @@ func InitializeApp() *App {
 	// DB 연결
 	database := config.InitDB()
 
+	// MinIO 클라이언트 생성 (환경 변수에서 로드)
+	minioClient := config.NewMinIOClient()
+
 	// Repository 생성
 	contentRepo := db.NewContentRepository(database)
 	schduleRepo := db.NewScheduleRepository(database)
 
 	// Adapter 생성
 	contentAdapter := adapter.NewContentAdapter(contentRepo, schduleRepo)
+	minioAdapter := adapter.NewMinIOAdapter(minioClient) 
 
 	// SavePort & LoadPort 변환
 	var savePort out.SavePort = contentAdapter
 	var loadPort out.LoadPort = contentAdapter
+	var minioPort out.MinIOPort = minioAdapter 
+	
 
 	// UseCase 생성
-	registerUseCase := service.NewContentManagementService(savePort)
+	registerUseCase := service.NewContentManagementService(savePort, minioPort)
 	findUseCase := service.NewContentFinderService(loadPort)
 
 	// 컨트롤러 생성
@@ -62,6 +69,7 @@ func InitializeApp() *App {
 		Router:          router,
 		GRPCServer:      grpcServer,
 		EurekaClient:    eurekaClient,
+		MinIOClient:     minioClient,
 	}
 }
 

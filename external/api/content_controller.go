@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"net/http"
 	"strconv"
 
@@ -98,6 +99,35 @@ func (cc *ContentController) SaveContent(c *gin.Context) {
 
 	// 변환된 응답 DTO 반환
 	c.JSON(http.StatusCreated, mapper.ToContentResponseDTO(content))
+}
+
+func (c *ContentController) SaveContentWithImage(ctx *gin.Context) {
+	// 1. JSON DTO 데이터 가져오기
+	dtoData := ctx.PostForm("dto")
+	var request dto.ContentRequestDTO
+	if err := json.Unmarshal([]byte(dtoData), &request); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "JSON 파싱 실패"})
+		return
+	}
+
+	// DTO → Domain 변환
+	content := mapper.ToContentDomain(&request)
+
+	// 3. 이미지 파일 가져오기
+	file, fileHeader, err := ctx.Request.FormFile("image")
+	if err != nil {
+		file = nil // 이미지가 없을 경우 nil 처리
+	}
+
+	// 4. UseCase 호출 (이미지 업로드 포함)
+	err = c.RegisterUseCase.SaveContentWithImage(content, file, fileHeader)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "콘텐츠 저장 실패"})
+		return
+	}
+
+	// 5. 성공 응답
+	ctx.JSON(http.StatusOK, gin.H{"message": "콘텐츠 저장 완료", "content": content})
 }
 
 // 콘텐츠 업데이트 API

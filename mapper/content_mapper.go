@@ -13,7 +13,7 @@ func ToContentDomain(dto *dto.ContentRequestDTO) *domain.Content {
         CodeGrp:   dto.CodeGrp,
         Title:     dto.Title,
         Content:   dto.Content,
-        Photo:     dto.Photo,
+        Photo:     "",
         MainText:  dto.MainText,
         SubText:   dto.SubText,
         ChkDup:    dto.ChkDup,

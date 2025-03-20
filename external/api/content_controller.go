@@ -101,33 +101,33 @@ func (cc *ContentController) SaveContent(c *gin.Context) {
 	c.JSON(http.StatusCreated, mapper.ToContentResponseDTO(content))
 }
 
-func (c *ContentController) SaveContentWithImage(ctx *gin.Context) {
-	// 1. JSON DTO 데이터 가져오기
-	dtoData := ctx.PostForm("dto")
+func (cc *ContentController) SaveContentWithImage(c *gin.Context) {
+	
+	// JSON DTO 데이터 가져오기
+	dtoData := c.PostForm("dto")
 	var request dto.ContentRequestDTO
 	if err := json.Unmarshal([]byte(dtoData), &request); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "JSON 파싱 실패"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "JSON 파싱 실패"})
 		return
 	}
 
 	// DTO → Domain 변환
 	content := mapper.ToContentDomain(&request)
 
-	// 3. 이미지 파일 가져오기
-	file, fileHeader, err := ctx.Request.FormFile("image")
+	// 이미지 파일 가져오기
+	file, fileHeader, err := c.Request.FormFile("image")
 	if err != nil {
 		file = nil // 이미지가 없을 경우 nil 처리
 	}
 
-	// 4. UseCase 호출 (이미지 업로드 포함)
-	err = c.RegisterUseCase.SaveContentWithImage(content, file, fileHeader)
+	// UseCase 호출 (이미지 업로드 포함)
+	err = cc.RegisterUseCase.SaveContentWithImage(content, file, fileHeader)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "콘텐츠 저장 실패"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "콘텐츠 저장 실패"})
 		return
 	}
 
-	// 5. 성공 응답
-	ctx.JSON(http.StatusOK, gin.H{"message": "콘텐츠 저장 완료", "content": content})
+	c.JSON(http.StatusOK, gin.H{"message": "콘텐츠 저장 완료", "content": content})
 }
 
 // 콘텐츠 업데이트 API
@@ -137,12 +137,55 @@ func (cc *ContentController) UpdateContent(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
 		return
 	}
+	idStr := c.Param("id")
+
+	id, err := strconv.ParseUint(idStr, 10, 64) // 10진수, 최대 64비트
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID 값이 올바르지 않습니다."})
+		return
+	}
 
 	// DTO → Domain 변환
 	content := mapper.ToContentDomain(&req)
+	content.ID = uint(id)
+	// 콘텐츠 업데이트
+	err = cc.RegisterUseCase.UpdateContent(content)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update content"})
+		return
+	}
+
+	// 변환된 응답 DTO 반환
+	c.JSON(http.StatusOK, mapper.ToContentResponseDTO(content))
+}
+
+func (cc *ContentController) UpdateContentWithImage(c *gin.Context) {
+	dtoData := c.PostForm("dto")
+	var req dto.ContentRequestDTO
+	if err := json.Unmarshal([]byte(dtoData), &req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "JSON 파싱 실패"})
+		return
+	}
+	idStr := c.Param("id")
+
+	id, err := strconv.ParseUint(idStr, 10, 64) // 10진수, 최대 64비트
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID 값이 올바르지 않습니다."})
+		return
+	}
+
+	// DTO → Domain 변환
+	content := mapper.ToContentDomain(&req)
+	content.ID = uint(id)
+
+	// 이미지 파일 가져오기
+	file, fileHeader, err := c.Request.FormFile("image")
+	if err != nil {
+		file = nil // 이미지가 없을 경우 nil 처리
+	}
 
 	// 콘텐츠 업데이트
-	err := cc.RegisterUseCase.UpdateContent(content)
+	err = cc.RegisterUseCase.UpdateContentWithImage(content,file,fileHeader)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update content"})
 		return

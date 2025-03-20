@@ -27,16 +27,10 @@ func (s *ContentManagementService) SaveContent(content *domain.Content) error {
 }
 
 func (s *ContentManagementService) SaveContentWithImage(content *domain.Content, file multipart.File, fileHeader *multipart.FileHeader) error {
-	// 1. 이미지가 있으면 MinIO에 업로드
-	if file != nil {
-		imageURL, err := s.minioPort.UploadImage(file, fileHeader)
-		if err != nil {
-			return fmt.Errorf("이미지 업로드 실패: %w", err)
-		}
-		content.Photo = imageURL // 2. Content 객체에 이미지 URL 저장
-	}
+	imageURL := s.uploadImage(file,fileHeader)
+	
+	content.Photo = imageURL
 
-	// 3. 콘텐츠 저장
 	return s.savePort.SaveContent(content)
 }
 
@@ -50,6 +44,14 @@ func (s *ContentManagementService) UpdateContent(content *domain.Content) error 
 	return s.savePort.UpdateContent(content)
 }
 
+func (s *ContentManagementService) UpdateContentWithImage(content *domain.Content, file multipart.File, fileHeader *multipart.FileHeader) error {
+	imageURL := s.uploadImage(file,fileHeader)
+	
+	content.Photo = imageURL
+
+	return s.savePort.UpdateContent(content)
+}
+
 // 콘텐츠 순서 수정
 func (s *ContentManagementService) ReorderContentRanks(idx []int, values []interface{}) error{
 	return s.savePort.UpdateRnk(idx,"Rnk",values)
@@ -58,4 +60,19 @@ func (s *ContentManagementService) ReorderContentRanks(idx []int, values []inter
 // 콘텐츠 삭제
 func (s *ContentManagementService) DeleteContent(contentId uint) error {
 	return s.savePort.DeleteContent(contentId)
+}
+
+// 이미지 업로드 처리 함수
+func (s *ContentManagementService) uploadImage(file multipart.File, fileHeader *multipart.FileHeader) string {
+	if file == nil {
+		return "" // 파일이 없으면 빈 문자열 반환
+	}
+
+	imageURL, err := s.minioPort.UploadImage(file, fileHeader)
+	if err != nil {
+		fmt.Printf("이미지 업로드 실패: %v\n", err)
+		return ""
+	}
+
+	return imageURL
 }

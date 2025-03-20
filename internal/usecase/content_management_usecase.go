@@ -12,6 +12,7 @@ type ContentManagementUseCase interface {
 	SaveContentWithImage(content *domain.Content, file multipart.File, fileHeader *multipart.FileHeader) error
 	SaveSchedule(schedule []domain.ContentSchedule) error
 	UpdateContent(content *domain.Content) error
+	UpdateContentWithImage(content *domain.Content, file multipart.File, fileHeader *multipart.FileHeader) error
 	ReorderContentRanks(idx []int, values []interface{})error
 	DeleteContent(contentId uint) error
 }

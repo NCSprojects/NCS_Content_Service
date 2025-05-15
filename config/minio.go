@@ -40,17 +40,17 @@ func NewMinIOClient() *MinIOClient {
 	// 버킷 존재 여부 확인
 	exists, err := client.BucketExists(ctx, bucketName) // context.Background() 사용
 	if err != nil {
-		log.Fatalf("버킷 확인 실패: %v", err)
+		log.Printf("버킷 확인 실패: %v", err)
+		//log.Fatalf("버킷 확인 실패: %v", err)
 	}
 	if !exists {
 		err = client.MakeBucket(ctx, bucketName, minio.MakeBucketOptions{}) // context 사용
 		if err != nil {
-			log.Fatalf("버킷 생성 실패: %v", err)
+			log.Printf("MinIO 버킷 생성 실패: %v", err)
 		}
-		fmt.Println("✅ MinIO 버킷 생성 완료:", bucketName)
+		fmt.Println("MinIO 버킷 생성 완료:", bucketName)
+		fmt.Println("MinIO 연결 성공")
 	}
-
-	fmt.Println("MinIO 연결 성공")
 	return &MinIOClient{
 		Client: client,
 		Bucket: bucketName,

@@ -14,6 +14,7 @@ import (
 type MinIOAdapter struct {
 	minioClient *minio.Client
 	bucketName  string
+	endpoint    string
 }
 
 // MinIOAdapter 생성자
@@ -21,6 +22,7 @@ func NewMinIOAdapter(minioClient *config.MinIOClient) *MinIOAdapter {
 	return &MinIOAdapter{
 		minioClient: minioClient.Client,
 		bucketName:  minioClient.Bucket,
+		endpoint:    minioClient.Endpoint,
 	}
 }
 
@@ -43,6 +45,6 @@ func (m *MinIOAdapter) UploadImage(file multipart.File, fileHeader *multipart.Fi
 	}
 
 	// 업로드된 파일의 URL 반환
-	imageURL := fmt.Sprintf("http://localhost:9000/%s/%s", m.bucketName, objectName)
+	imageURL := fmt.Sprintf("http://%s/%s/%s", m.endpoint, m.bucketName, objectName)
 	return imageURL, nil
 }

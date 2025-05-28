@@ -10,20 +10,21 @@ import (
 
 // ContentAdapter 구조체 (SavePort & LoadPort 동시 구현)
 type ContentAdapter struct {
-	contentRepository db.ContentRepository // Repository 주입
+	contentRepository  db.ContentRepository // Repository 주입
 	scheduleRepository db.ScheduleRepository
 }
 
-var _ out.SavePort = (*ContentAdapter)(nil) 
-var _ out.LoadPort = (*ContentAdapter)(nil) 
+var _ out.SavePort = (*ContentAdapter)(nil)
+var _ out.LoadPort = (*ContentAdapter)(nil)
+
 // ContentAdapter 생성자
-func NewContentAdapter(contentRepo db.ContentRepository ,scheduleRepo db.ScheduleRepository ) *ContentAdapter {
+func NewContentAdapter(contentRepo db.ContentRepository, scheduleRepo db.ScheduleRepository) *ContentAdapter {
 	return &ContentAdapter{contentRepository: contentRepo, scheduleRepository: scheduleRepo}
-	
+
 }
 
 func (a *ContentAdapter) GetAllContents() ([]*domain.Content, error) {
-	panic("unimplemented")
+	return a.contentRepository.GetAll()
 }
 
 func (a *ContentAdapter) GetContentByID(id uint) (*domain.Content, error) {
@@ -34,17 +35,17 @@ func (a *ContentAdapter) GetContentByCodeGroup(codeGrp string) ([]*domain.Conten
 	return a.contentRepository.GetByCodeGroup(codeGrp)
 }
 
-func (a *ContentAdapter) GetSchedulesByContentID(contentID uint,startDate time.Time,endDate time.Time) ([]*domain.ContentSchedule, error) {
-	return a.scheduleRepository.GetByContentID(contentID,startDate,endDate)
+func (a *ContentAdapter) GetSchedulesByContentID(contentID uint, startDate time.Time, endDate time.Time) ([]*domain.ContentSchedule, error) {
+	return a.scheduleRepository.GetByContentID(contentID, startDate, endDate)
 }
 
-func (a* ContentAdapter) GetSchedulesByStartTime(startTime time.Time) ([]*domain.ContentSchedule, error) {
+func (a *ContentAdapter) GetSchedulesByStartTime(startTime time.Time) ([]*domain.ContentSchedule, error) {
 	return a.scheduleRepository.GetByStartTime(startTime)
 }
 
-func (a* ContentAdapter) GetSchedulesByScheduleId(scheduleId uint) (*domain.ContentSchedule, error) {
+func (a *ContentAdapter) GetSchedulesByScheduleId(scheduleId uint) (*domain.ContentSchedule, error) {
 	return a.scheduleRepository.GetByID(scheduleId)
-} 
+}
 
 func (a *ContentAdapter) SaveContent(content *domain.Content) error {
 	return a.contentRepository.Create(content)
@@ -59,19 +60,16 @@ func (a *ContentAdapter) UpdateContent(content *domain.Content) error {
 }
 
 func (a *ContentAdapter) UpdateRnk(idx []int, columnName string, values []interface{}) error {
-	return a.contentRepository.BulkColumnUpdate(idx,columnName,values)
+	return a.contentRepository.BulkColumnUpdate(idx, columnName, values)
 }
 
-func (a *ContentAdapter) UpdateSchedule(schedule *domain.ContentSchedule) error{
+func (a *ContentAdapter) UpdateSchedule(schedule *domain.ContentSchedule) error {
 	return a.scheduleRepository.Update(schedule)
 }
 
-func (a *ContentAdapter) DeleteContent(contentId uint ) error {
+func (a *ContentAdapter) DeleteContent(contentId uint) error {
 	return a.contentRepository.Delete(contentId)
 }
-func (a *ContentAdapter) DeleteContentSchedule(ScheduleId uint ) error{
+func (a *ContentAdapter) DeleteContentSchedule(ScheduleId uint) error {
 	return a.scheduleRepository.Delete(ScheduleId)
 }
-
-
-

@@ -13,8 +13,9 @@ import (
 
 // MinIOClient 구조체 정의
 type MinIOClient struct {
-	Client *minio.Client
-	Bucket string
+	Client   *minio.Client
+	Bucket   string
+	Endpoint string
 }
 
 // MinIO 클라이언트 초기화
@@ -49,10 +50,11 @@ func NewMinIOClient() *MinIOClient {
 			log.Printf("MinIO 버킷 생성 실패: %v", err)
 		}
 		fmt.Println("MinIO 버킷 생성 완료:", bucketName)
-		fmt.Println("MinIO 연결 성공")
+		fmt.Println("MinIO 연결 시도")
 	}
 	return &MinIOClient{
-		Client: client,
-		Bucket: bucketName,
+		Client:   client,
+		Bucket:   bucketName,
+		Endpoint: endpoint,
 	}
 }
